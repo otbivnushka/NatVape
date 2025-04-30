@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+@import 'reset';
+@import 'variables';
+@import 'fonts';
+@import 'mixins';
+@import 'core';
+
+@import 'blocks/header';
+@import 'blocks/catalog';
+@import 'blocks/cart';
+@import 'blocks/profile';
+@import 'blocks/catalog-main';

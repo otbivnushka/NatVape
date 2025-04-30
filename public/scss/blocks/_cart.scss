@@ -1,0 +1,8 @@
+.cart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &__title {
+        font-style: 30px;
+    }
+}
