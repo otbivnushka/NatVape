@@ -1,14 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
 
-// === Настройки ===
 const PORT = 3000;
-const token = '7864852032:AAGuul8DMOybs9JrROLTY8iIFZpc-Y78QNI';
-// const WEBAPP_URL = `https://localhost:${PORT}/webapp`; // Поменяй при деплое
-const WEBAPP_URL = `https://natvape-production.up.railway.app/webapp/`;
+const token = process.env.TELEGRAM_BOT_TOKEN;
+const WEBAPP_URL = process.env.TELEGRAM_WEBAPP_URL;
 
 // === Telegram Bot ===
 const bot = new TelegramBot(token, { polling: true });
@@ -43,21 +42,11 @@ bot.on('message', (msg) => {
 
 const app = express();
 
-// const pool = new Pool({
-//   user: 'postgres',
-//   host: 'localhost',
-//   database: 'db',
-//   password: '2342',
-//   port: 5432,
-// });
-
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:SVuibunbRcVuOohBEaILfxluWLLUnwQg@ballast.proxy.rlwy.net:16389/railway';
+const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: false,
 });
 
 app.use(cors());
@@ -69,23 +58,9 @@ app.get('/api/products', (req, res) => {
   const category = req.query.category || '';
   pool.query('SELECT * FROM products WHERE category = $1', [category], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
-    console.log(result.rows);
     const updatedRows = result.rows.map(row => ({
       ...row,
-      image: `https://natvape-production.up.railway.app/${row.image}`
-    }));
-
-    res.json(updatedRows);
-  });
-});
-
-app.get('/api/products', (req, res) => {
-  const category = req.query.category || '';
-  pool.query('SELECT * FROM products WHERE category = $1', [category], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    const updatedRows = result.rows.map(row => ({
-      ...row,
-      image: `https://natvape-production.up.railway.app/${row.image}`
+      image: `${process.env.TELEGRAM_WEBAPP_URL}/${row.image}`
     }));
 
     res.json(updatedRows);

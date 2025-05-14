@@ -1,4 +1,5 @@
 let cartArray = JSON.parse(localStorage.getItem('cartArray')) || [];
+const SERVER_URL = "http://localhost:3000";
 
 function navigate(page, params = {}) {
     const content = document.getElementById('content');
@@ -53,7 +54,7 @@ function renderCategory(category) {
     if (productsContainer) {
         productsContainer.innerHTML = 'Загрузка...';
 
-        fetch(`https://natvape-production.up.railway.app/api/products?category=${encodeURIComponent(category)}`)
+        fetch(`${SERVER_URL}/api/products?category=${encodeURIComponent(category)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.length === 0) {
@@ -101,7 +102,7 @@ async function showModalAddToCart(id, name, price, image) {
     
     // Получаем данные из API
     try {
-        const res = await fetch(`https://natvape-production.up.railway.app/api/product-types?id=${encodeURIComponent(id)}`);
+        const res = await fetch(`${SERVER_URL}/api/product-types?id=${encodeURIComponent(id)}`);
         const data = await res.json();
         console.log(data);
         
