@@ -1,8 +1,82 @@
 .cart {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &__title {
-        font-style: 30px;
+    margin-bottom: 100px;
+    &__header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        align-self: center;
+        border-bottom: 1px $border solid;
+        &-text {
+            text-wrap-mode: nowrap;
+            font-size: 25px;
+            font-weight: 600;
+        }
+    }
+    &__container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 10px;
+        gap: 10px;
+    }
+    &__item {
+        padding: 10px;
+        border: 1px $border solid;
+        border-radius: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        img {
+            height: 50px;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+    }
+    &__footer {
+        border-top: 1px $border solid;
+        display: flex;
+        justify-content: space-around;
+        padding: 40px 10px 20px;
+        &-total-price {
+            font-size: 30px;
+            font-weight: 700;
+            align-self: center
+        }
+        &-btn-clear {
+            @include btn(rgb(255, 61, 61), #fff, $border);
+        }
+        &-btn-aprove {
+            @include btn(rgb(69, 255, 62), #fff, $border);
+        }
+        &-btns {
+            display: flex;
+            flex-direction: column;
+            gap:10px;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}
+
+@media (max-width: 1150px) {
+    .cart__container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 700px) {
+    .cart__container {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 450px) {
+    .cart__footer-total-price {
+        font-size: 15px;
+    }
+    .cart__footer-btns{
+        button {
+            font-size: 10px;
+        }
     }
 }
