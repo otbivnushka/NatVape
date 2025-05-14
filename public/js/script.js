@@ -53,7 +53,7 @@ function renderCategory(category) {
     if (productsContainer) {
         productsContainer.innerHTML = 'Загрузка...';
 
-        fetch(`http://localhost:3000/api/products?category=${encodeURIComponent(category)}`)
+        fetch(`https://natvape-production.up.railway.app/api/products?category=${encodeURIComponent(category)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.length === 0) {
@@ -101,7 +101,7 @@ async function showModalAddToCart(id, name, price, image) {
     
     // Получаем данные из API
     try {
-        const res = await fetch(`http://localhost:3000/api/product-types?id=${encodeURIComponent(id)}`);
+        const res = await fetch(`https://natvape-production.up.railway.app/api/product-types?id=${encodeURIComponent(id)}`);
         const data = await res.json();
         console.log(data);
         
