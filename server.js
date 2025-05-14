@@ -8,7 +8,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const PORT = 3000;
 const token = '7864852032:AAGuul8DMOybs9JrROLTY8iIFZpc-Y78QNI';
 // const WEBAPP_URL = `https://localhost:${PORT}/webapp`; // Поменяй при деплое
-const WEBAPP_URL = `https://ru.wikipedia.org/`;
+const WEBAPP_URL = `https://natvape-production.up.railway.app/webapp/`;
 
 // === Telegram Bot ===
 const bot = new TelegramBot(token, { polling: true });
@@ -72,7 +72,7 @@ app.get('/api/products', (req, res) => {
     console.log(result.rows);
     const updatedRows = result.rows.map(row => ({
       ...row,
-      image: `http://localhost:${PORT}/${row.image}`
+      image: `https://natvape-production.up.railway.app/${row.image}`
     }));
 
     res.json(updatedRows);
@@ -85,7 +85,7 @@ app.get('/api/products', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     const updatedRows = result.rows.map(row => ({
       ...row,
-      image: `http://localhost:${PORT}/${row.image}`
+      image: `https://natvape-production.up.railway.app/${row.image}`
     }));
 
     res.json(updatedRows);
