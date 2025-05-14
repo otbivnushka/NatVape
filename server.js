@@ -11,44 +11,53 @@ const token = '7864852032:AAGuul8DMOybs9JrROLTY8iIFZpc-Y78QNI';
 const WEBAPP_URL = `https://ru.wikipedia.org/`;
 
 // === Telegram Bot ===
-// const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token, { polling: true });
 
-// bot.on('message', (msg) => {
-//   console.log(msg);
-//   if (msg.text === '/start')
-//   {
+bot.on('message', (msg) => {
+  console.log(msg);
+  if (msg.text === '/start')
+  {
     
-//     const keyboard = {
-//       keyboard: [
-//         [
-//           {
-//             text: 'Открыть приложение',
-//             web_app: { url: WEBAPP_URL }
-//           }
-//         ]
-//       ],
-//       resize_keyboard: true
-//     };
-//     bot.sendMessage(msg.chat.id, `Привет, @${msg.from.username}!\nДля того чтобы сделать заказ запусти приложение`, {
-//       reply_markup: keyboard
-//     });
-//   }
-//   else
-//   {
-//     bot.sendMessage(msg.chat.id, 'Не понимаю тебя');
-//   }
-// });
+    const keyboard = {
+      keyboard: [
+        [
+          {
+            text: 'Открыть приложение',
+            web_app: { url: WEBAPP_URL }
+          }
+        ]
+      ],
+      resize_keyboard: true
+    };
+    bot.sendMessage(msg.chat.id, `Привет, @${msg.from.username}!\nДля того чтобы сделать заказ запусти приложение`, {
+      reply_markup: keyboard
+    });
+  }
+  else
+  {
+    bot.sendMessage(msg.chat.id, 'Не понимаю тебя');
+  }
+});
 
 // === Express Backend ===
 
 const app = express();
 
+// const pool = new Pool({
+//   user: 'postgres',
+//   host: 'localhost',
+//   database: 'db',
+//   password: '2342',
+//   port: 5432,
+// });
+
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:SVuibunbRcVuOohBEaILfxluWLLUnwQg@ballast.proxy.rlwy.net:16389/railway';
+
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'db',
-  password: '2342',
-  port: 5432,
+  connectionString,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 app.use(cors());
