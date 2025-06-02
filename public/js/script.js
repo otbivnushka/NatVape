@@ -13,8 +13,9 @@ function navigate(page, params = {}) {
         })
         .then(html => {
             content.innerHTML = html;
-
-            // Если есть параметры, например для catalog-main
+            if (page === 'catalog') {
+                renderCatalog();
+            }
             if (page === 'catalog-main' && params.category) {
                 renderCategory(params.category);
                 console.log('catalog-main');
@@ -41,6 +42,10 @@ function parseHash() {
     }
 
     return { page: page || 'catalog', params };
+}
+
+function renderCatalog() {
+
 }
 
 function renderCategory(category) {
