@@ -11,3 +11,9 @@ h1, h2, h3 {
     max-width: 1440px;
     margin: 0 auto;
 }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+.hiden {
+    display: none !important;
+}

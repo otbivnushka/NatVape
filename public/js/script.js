@@ -1,5 +1,32 @@
 let cartArray = JSON.parse(localStorage.getItem('cartArray')) || [];
 const SERVER_URL = "http://localhost:3000";
+let user_info = {};
+
+window.addEventListener('load', () => {
+    const overlay = document.createElement('div');
+    overlay.classList.add('loader-overlay');
+    const logo = document.createElement('div');
+    logo.classList.add('logo');
+    
+    overlay.appendChild(logo);
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        document.body.removeChild(overlay);
+        document.querySelector(".header").classList.remove('hiden');
+    }, 1000);
+
+    if (window.Telegram && Telegram.WebApp) {
+        const tg = Telegram.WebApp;
+        tg.expand();
+        const user = tg.initDataUnsafe.user;
+        user_info.login = user.nickname;
+        user_info.chat_id = user.id;
+        console.log('User:', user);
+    } else {
+        console.log('Пожалуйста, открой это приложение внутри Telegram');
+    }
+});
 
 function navigate(page, params = {}) {
     const content = document.getElementById('content');
@@ -16,8 +43,8 @@ function navigate(page, params = {}) {
             if (page === 'catalog') {
                 renderCatalog();
             }
-            if (page === 'catalog-main' && params.category) {
-                renderCategory(params.category);
+            if (page === 'catalog-main' && params.category_id && params.category_name) {
+                renderCategory(params.category_id, params.category_name);
                 console.log('catalog-main');
             }
             if (page === 'cart') {
@@ -30,7 +57,7 @@ function navigate(page, params = {}) {
 }
 
 function parseHash() {
-    const hash = location.hash.slice(1); // убираем #
+    const hash = location.hash.slice(1);
     const [page, queryString] = hash.split('?');
     const params = {};
 
@@ -45,21 +72,48 @@ function parseHash() {
 }
 
 function renderCatalog() {
+    const catalogContainer = document.querySelector("#catalog");
 
+    if (catalogContainer) {
+        catalogContainer.innerHTML = "Loading...";
+        fetch(`${SERVER_URL}/api/category`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    productsContainer.innerHTML = '<p>Товары не найдены.</p>';
+                    return;
+                }
+                catalogContainer.innerHTML = '';
+                for (let item of data)
+                {
+                    if (!item.products_amount) continue;
+                    catalogContainer.innerHTML += `
+                        <a class="catalog-item" href="#catalog-main?category_id=${item.id}&category_name=${item.name}">
+                            <img src="${item.image_url}" alt="">
+                            <div class="catalog-item__info">
+                                <h3 class="catalog-item__title">${item.name}</h3>
+                                <h6 class="catalog-item__amount">Товаров: ${item.products_amount}</h6>
+                            </div>
+                        </a>
+                    `;
+                }
+            })
+    }
 }
 
-function renderCategory(category) {
+function renderCategory(category, category_name) {
+    console.log(category);
     const categoryTitle = document.getElementById('category-title');
     const productsContainer = document.getElementById('products-container');
 
     if (categoryTitle) {
-        categoryTitle.textContent = decodeURIComponent(category);
+        categoryTitle.textContent = decodeURIComponent(category_name);
     }
 
     if (productsContainer) {
         productsContainer.innerHTML = 'Загрузка...';
 
-        fetch(`${SERVER_URL}/api/products?category=${encodeURIComponent(category)}`)
+        fetch(`${SERVER_URL}/api/product?category_id=${encodeURIComponent(category)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.length === 0) {
@@ -69,9 +123,11 @@ function renderCategory(category) {
                 productsContainer.innerHTML = '';
                 for (let item of data)
                 {
+                    if (item.product_types_amount === 0)
+                        continue;
                     productsContainer.innerHTML += `
                         <div class="product-card" id="product-id-${item.id}">
-                            <img src="${item.image}" alt="${item.name}">
+                            <img src="${item.image_url}" alt="${item.name}">
                             <h3>${item.name}</h3>
                             <p>${item.price} BYN</p>
                             <button class="product-card__button" id="product-id-btn-${item.id}">В корзину</button>
@@ -80,7 +136,7 @@ function renderCategory(category) {
 
                     productsContainer.addEventListener('click', e => {
                         if (e.target && e.target.id === `product-id-btn-${item.id}`) {
-                            showModalAddToCart(item.id, item.name, item.price, item.image);
+                            showModalAddToCart(item.id, item.name, item.price, item.image_url);
                         }
                     });
                 }
@@ -104,22 +160,23 @@ window.addEventListener('hashchange', () => {
 
 async function showModalAddToCart(id, name, price, image) {
     let options = '';
+    let data = [];
     
-    // Получаем данные из API
     try {
-        const res = await fetch(`${SERVER_URL}/api/product-types?id=${encodeURIComponent(id)}`);
-        const data = await res.json();
-        console.log(data);
+        const res = await fetch(`${SERVER_URL}/api/product/${encodeURIComponent(id)}`);
+        const data1 = await res.json();
+        data = data1.product_types.filter(item => item.available);
         
         data.forEach(item => {
-            if (item.available) {
-                options += `<option value="${item.type}" id="type-${item.id}">${item.type}</option>`;
-            }
+            options += `<option value="${item.type}" id="type-${item.id}">${item.type}</option>`;
         });
     } catch (error) {
         console.error('Ошибка при получении данных:', error);
-        return; // Прерываем выполнение, если произошла ошибка при запросе.
+        return;
     }
+
+    let amount = 1;
+    let max_amount = data[0].amount;
 
     const overlay = document.createElement('div');
     overlay.classList.add('overlay');
@@ -141,7 +198,9 @@ async function showModalAddToCart(id, name, price, image) {
                 ${options}
             </select>
         </div>
-
+        <div class="modal__amount">
+            <label>Всего на складе: <span id="modal__max-amount-num">${max_amount}</span></label>
+        </div>
         <div class="modal__amount">
             <label>Выбери количество:</label>
             <button id="modal__btn-minus">-</button>
@@ -156,27 +215,40 @@ async function showModalAddToCart(id, name, price, image) {
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
-    let amount = 1;
+
+    const selectField = modal.querySelector('#product-type');
+    selectField.addEventListener('change', () => {
+        const temp = data.find(item => item.type === selectField.value);
+        console.log(temp);
+        max_amount = temp.amount;
+        amount = 1;
+        modal.querySelector('#modal__amount-num').innerText = amount;
+        modal.querySelector('#modal__max-amount-num').innerText = max_amount;
+    });
 
     const cancelButton = modal.querySelector('#modal__btn--cancel');
     cancelButton.addEventListener('click', () => {
         document.body.removeChild(overlay);
     });
 
-    const deleteButton = modal.querySelector('#modal__btn--add');
-    deleteButton.addEventListener('click', () => {
+    const addButton = modal.querySelector('#modal__btn--add');
+    addButton.addEventListener('click', async () => {
         document.body.removeChild(overlay);
         let type = modal.querySelector('#product-type').value;
         item = {
-            id: id,
-            name: name,
-            price: +price,
-            type: type,
-            amount: amount,
-            image: image
+            cart_id: 10,
+            product_type_id: data.find((item) => type === item.type).id,
+            quantity: amount
         };
-        cartArray.push(item);
-        localStorage.setItem('cartArray', JSON.stringify(cartArray));
+        const res = await fetch(`${SERVER_URL}/api/cart/add`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(item),
+        });
+        // cartArray.push(item);
+        // localStorage.setItem('cartArray', JSON.stringify(cartArray));
     });
 
     const minusButton = modal.querySelector('#modal__btn-minus');
@@ -187,28 +259,26 @@ async function showModalAddToCart(id, name, price, image) {
 
     const plusButton = modal.querySelector('#modal__btn-plus');
     plusButton.addEventListener('click', () => {
-        amount++;
+        if (amount < max_amount) amount++;
         modal.querySelector('#modal__amount-num').innerText = amount;
     });
 }
 
 function renderCart() {
-    const totalPrice = cartArray.reduce((total, item) => total + item.price * item.amount, 0);
     const mainContainer = document.querySelector('.cart__main');
-    if (totalPrice === 0) {
-        mainContainer.innerHTML = `
-            <div>
-                <div>В корзине ничего нет</div>
-            </div>
-        `;
-        return;
-    }
-    function setItems() {
+    
+    async function setItems() {
         const container = document.querySelector('#cart__container');
         const priceLabel = document.querySelector('#cart__footer-total-price-number');
         
-        priceLabel.innerText = totalPrice;
         container.innerHTML = '';
+        let cartArray = [];
+        await fetch(`${SERVER_URL}/api/cart/${10}`)
+            .then(res => res.json())
+            .then(data => cartArray = data);
+        const totalPrice = cartArray.reduce((sum, item) => sum + item.price * item.quantity, 0)
+        priceLabel.innerText = totalPrice;
+
         if (cartArray.length === 0) {
             
             mainContainer.innerHTML = `
@@ -224,7 +294,7 @@ function renderCart() {
                     <div class="cart__name-label">${item.name}</div>
                     <div class="cart__price-label">${item.price}</div>
                     <div class="cart__type-label">${item.type}</div>
-                    <div class="cart__amount-label">${item.amount} шт.</div>
+                    <div class="cart__amount-label">${item.quantity} шт.</div>
                 </div>
             `;
         }
@@ -235,9 +305,20 @@ function renderCart() {
     const aproveBtn = document.querySelector('#cart__aprove');
     
 
-    clearBtn.addEventListener('click', () => {
-        cartArray = [];
-        localStorage.setItem('cartArray', JSON.stringify(cartArray));
+    clearBtn.addEventListener('click', async () => {
+        let cartArray = [];
+        await fetch(`${SERVER_URL}/api/cart/${10}`)
+            .then(res => res.json())
+            .then(data => cartArray = data);
+        for (let item of cartArray) {
+            await fetch(`${SERVER_URL}/api/cart/delete`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify( { cart_id: item.cart_id, product_type_id: item.product_type_id } ),
+            });
+        }
         setItems();
     });
     aproveBtn.addEventListener('click', () => {

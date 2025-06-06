@@ -34,8 +34,16 @@ class ProductController {
     static async getAllProduct(req, res) {
         try {
             const category_id = req.query.category_id || '';
-            const result = await pool.query('SELECT * FROM products WHERE category_id = $1', [category_id]);
-            res.status(200).json(result.rows);
+            const products = await pool.query('SELECT * FROM products WHERE category_id = $1', [category_id]);
+            const productsArray = products.rows;
+            console.log(productsArray);
+            for (let item of productsArray) {
+                const tempProductTypes = await pool.query('SELECT * FROM product_types WHERE product_id = $1', [item.id]);
+                let tempProductTypesArray = tempProductTypes.rows;
+                tempProductTypesArray = tempProductTypesArray.filter(item => item.available);
+                item.product_types_amount = tempProductTypesArray.length;
+            }
+            res.status(200).json(products.rows);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Server error' });

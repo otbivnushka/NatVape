@@ -79,7 +79,7 @@ async function setupDatabase() {
         // Вкусы для продуктов
         const productTypesData = [
             {
-                productName: 'HOTSPOT DOT',
+                productId: 25,
                 types: [
                     { type: 'Ананас яблоко', available: false, amount: 0 },
                     { type: 'Малина смородина', available: true, amount: 4 },
@@ -90,7 +90,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'HOTSPOT FUEL',
+                productId: 26,
                 types: [
                     { type: 'Манго грейпфрут', available: true, amount: 10 },
                     { type: 'Кислые лесные ягоды', available: true, amount: 4 },
@@ -110,7 +110,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'PODONKI V1',
+                productId: 29,
                 types: [
                     { type: 'Жвачка абрикос', available: false, amount: 0 },
                     { type: 'Малиново-клубничная жвачка', available: true, amount: 5 },
@@ -132,7 +132,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'PODONKI VINTAGE',
+                productId: 30,
                 types: [
                     { type: 'Ежевичный лимонад', available: false, amount: 0 },
                     { type: 'Клюквенная газировка', available: true, amount: 9 },
@@ -152,7 +152,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'MALASIAN x PODONKI V1',
+                productId: 31,
                 types: [
                     { type: 'Малина клубника черная и красная смородина', available: false, amount: 0 },
                     { type: 'Черника малина лимон', available: true, amount: 8 },
@@ -167,7 +167,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Rick & Morty на замерзоне',
+                productId: 36,
                 types: [
                     { type: 'Лимонад виноград вишня', available: false, amount: 0 },
                     { type: 'Кислые чернично-малиновые червячки', available: false, amount: 0 },
@@ -229,7 +229,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Картридж Xros',
+                productId: 38,
                 types: [
                     { type: '0.4 omh', available: true, amount: 8 },
                     { type: '0.6 omh', available: true, amount: 6 },
@@ -237,14 +237,14 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Картридж V.thru',
+                productId: 39,
                 types: [
                     { type: '0.4 omh', available: true, amount: 7 },
                     { type: '0.7 omh', available: true, amount: 6 }
                 ]
             },
             {
-                productName: 'ГРЕХ САМОУБИЙЦА',
+                productId: 99999999999999999999,
                 types: [
                     { type: 'Земляника черника', available: false, amount: 0 },
                     { type: 'Манго ананас', available: true, amount: 9 },
@@ -269,7 +269,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'АНАРХИЯ',
+                productId: 9999999999999999999999,
                 types: [
                     { type: 'Сладко-цитрусовый вкус белого монстра', available: false, amount: 0 },
                     { type: 'Сладкая алая клубника с холодом', available: false, amount: 0 },
@@ -295,14 +295,14 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Испаритель Knight 80/Pasito 2',
+                productId: 40,
                 types: [
                     { type: '0,3 Ом', available: false, amount: 0 },
                     { type: '0,4 Ом', available: true, amount: 6 }
                 ]
             },
             {
-                productName: 'PODINKI × HYLINET',
+                productId: 33,
                 types: [
                     { type: 'Мохито', available: false, amount: 0 },
                     { type: 'Бабл Гам', available: false, amount: 0 },
@@ -332,7 +332,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'ISTERIKA',
+                productId: 42,
                 types: [
                     { type: 'Dr.papper', available: false, amount: 0 },
                     { type: 'Апельсиновый фреш', available: false, amount: 0 },
@@ -359,7 +359,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'CATSWILL',
+                productId: 'CATSWILL',
                 types: [
                     { type: 'Мятная жвачка', available: true, amount: 8 },
                     { type: 'Клубника жвачка банан', available: false, amount: 0 },
@@ -403,14 +403,14 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Испаритель B-serias',
+                productId: 'Испаритель B-serias',
                 types: [
                     { type: 'Сопротивление: 0.3 Ом', available: false, amount: 0 },
                     { type: 'Сопротивление 0.2 Ом', available: true, amount: 6 }
                 ]
             },
             {
-                productName: 'HOTSPOT FUEL UP',
+                productId: 'HOTSPOT FUEL UP',
                 types: [
                     { type: 'Клюква Киви', available: false, amount: 0 },
                     { type: 'Манго Банан Ментол', available: false, amount: 0 },
@@ -425,7 +425,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'MALASIAN x PODONKI V2',
+                productId: 'MALASIAN x PODONKI V2',
                 types: [
                     { type: 'Киви-ананас', available: false, amount: 0 },
                     { type: 'Грейпфрут-гуава', available: true, amount: 7 },
@@ -440,7 +440,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Protest',
+                productId: 'Protest',
                 types: [
                     { type: 'Черника + Смородина', available: false, amount: 0 },
                     { type: 'Черника + Дыня', available: false, amount: 0 },
@@ -455,7 +455,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'CATSWILL SOUR',
+                productId: 'CATSWILL SOUR',
                 types: [
                     { type: 'Кислые желатинки с маракуей и ананасом', available: true, amount: 7 },
                     { type: 'Кислый грейпфрут с вишней', available: true, amount: 6 },
@@ -471,7 +471,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'Isterika 205mg',
+                productId: 'Isterika 205mg',
                 types: [
                     { type: 'Фрутелла', available: false, amount: 0 },
                     { type: 'Кислый скитлс', available: false, amount: 0 },
@@ -482,7 +482,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'OGGO Sour',
+                productId: 'OGGO Sour',
                 types: [
                     { type: 'Кислое киви', available: false, amount: 0 },
                     { type: 'Кислое яблоко', available: false, amount: 0 },
@@ -492,13 +492,13 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'СОЛЕВАЯ МОНАШКА',
+                productId: 'СОЛЕВАЯ МОНАШКА',
                 types: [
                     { type: 'Ванильный панкейк с клубникой и сливками', available: true, amount: 6 }
                 ]
             },
             {
-                productName: 'PODONKI PODGON',
+                productId: 'PODONKI PODGON',
                 types: [
                     { type: 'Кокос малина', available: true, amount: 6 },
                     { type: 'Брусника в сахаре', available: true, amount: 7 },
@@ -508,7 +508,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'FREEZE MONKEY MAX FLAVOR',
+                productId: 'FREEZE MONKEY MAX FLAVOR',
                 types: [
                     { type: 'Ягодный йогурт', available: true, amount: 6 },
                     { type: 'Груша', available: true, amount: 6 },
@@ -518,7 +518,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'PODONKI LAST HAP',
+                productId: 'PODONKI LAST HAP',
                 types: [
                     { type: 'Вафли с клубничным сиропом', available: true, amount: 7 },
                     { type: 'Черно-смородиновый мармелад', available: false, amount: 0 },
@@ -538,7 +538,7 @@ async function setupDatabase() {
                 ]
             },
             {
-                productName: 'CATSWILL DOTA',
+                productId: 'CATSWILL DOTA',
                 types: [
                     { type: 'SHADOW FIEND', available: true, amount: 6 },
                     { type: 'MEEPO', available: true, amount: 7 },
