@@ -1,8 +1,39 @@
-let cartArray = JSON.parse(localStorage.getItem('cartArray')) || [];
+let cartID = 0;
 const SERVER_URL = "http://localhost:3000";
 let user_info = {};
 
-window.addEventListener('load', () => {
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+
+async function getCartID() {
+    if (getCookie('cart_id')) {
+        cartID = +getCookie('cart_id');
+    } else {    
+        let temp;
+        await fetch(`${SERVER_URL}/api/cart`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify( { user_id: user_info.id } )
+        })
+        .then(res => res.json())
+        .then(data => temp = data.id);
+        document.cookie = `cart_id=${temp}; max-age=3600; path=/; secure; samesite=strict`;
+        cartID = temp;
+    }
+}
+
+async function getUserInfo() {
+    await fetch(`${SERVER_URL}/api/user/${'chinathez'}`)
+    .then(res => res.json())
+    .then(data => user_info = data);
+}
+
+window.addEventListener('load', async () => {
+    refreshApp();
     const overlay = document.createElement('div');
     overlay.classList.add('loader-overlay');
     const logo = document.createElement('div');
@@ -15,7 +46,9 @@ window.addEventListener('load', () => {
         document.body.removeChild(overlay);
         document.querySelector(".header").classList.remove('hiden');
     }, 1000);
-
+    await getUserInfo();
+    await getCartID();
+    console.log(cartID);
     if (window.Telegram && Telegram.WebApp) {
         const tg = Telegram.WebApp;
         tg.expand();
@@ -28,10 +61,10 @@ window.addEventListener('load', () => {
     }
 });
 
-function navigate(page, params = {}) {
+async function navigate(page, params = {}) {
     const content = document.getElementById('content');
     
-    fetch(`pages/${page}.html`)
+    await fetch(`pages/${page}.html`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Страница не найдена');
@@ -49,6 +82,9 @@ function navigate(page, params = {}) {
             }
             if (page === 'cart') {
                 renderCart();
+            }
+            if (page === 'profile') {
+                renderCabinet();
             }
         })
         .catch(error => {
@@ -75,7 +111,7 @@ function renderCatalog() {
     const catalogContainer = document.querySelector("#catalog");
 
     if (catalogContainer) {
-        catalogContainer.innerHTML = "Loading...";
+        catalogContainer.innerHTML = `<div style="margin: 150px auto;">Loading...</div>`;
         fetch(`${SERVER_URL}/api/category`)
             .then(res => res.json())
             .then(data => {
@@ -148,13 +184,13 @@ function renderCategory(category, category_name) {
     }
 }
 
-function refreshApp() {
+async function refreshApp() {
     const { page, params } = parseHash();
-    navigate(page, params);
+    await navigate(page, params);
 }
-refreshApp();
-window.addEventListener('hashchange', () => {
-    refreshApp();
+
+window.addEventListener('hashchange', async () => {
+    await refreshApp();
     console.log("HashChange");
 });
 
@@ -236,7 +272,7 @@ async function showModalAddToCart(id, name, price, image) {
         document.body.removeChild(overlay);
         let type = modal.querySelector('#product-type').value;
         item = {
-            cart_id: 10,
+            cart_id: cartID,
             product_type_id: data.find((item) => type === item.type).id,
             quantity: amount
         };
@@ -266,14 +302,14 @@ async function showModalAddToCart(id, name, price, image) {
 
 function renderCart() {
     const mainContainer = document.querySelector('.cart__main');
-    
+
     async function setItems() {
         const container = document.querySelector('#cart__container');
         const priceLabel = document.querySelector('#cart__footer-total-price-number');
         
         container.innerHTML = '';
-        let cartArray = [];
-        await fetch(`${SERVER_URL}/api/cart/${10}`)
+        let cartArray;
+        await fetch(`${SERVER_URL}/api/cart/${cartID}`)
             .then(res => res.json())
             .then(data => cartArray = data);
         const totalPrice = cartArray.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -282,7 +318,7 @@ function renderCart() {
         if (cartArray.length === 0) {
             
             mainContainer.innerHTML = `
-            <div>
+            <div class="empty-cart">
                 <div>В корзине ничего нет</div>
             </div>
         `;
@@ -307,7 +343,7 @@ function renderCart() {
 
     clearBtn.addEventListener('click', async () => {
         let cartArray = [];
-        await fetch(`${SERVER_URL}/api/cart/${10}`)
+        await fetch(`${SERVER_URL}/api/cart/${cartID}`)
             .then(res => res.json())
             .then(data => cartArray = data);
         for (let item of cartArray) {
@@ -321,8 +357,70 @@ function renderCart() {
         }
         setItems();
     });
-    aproveBtn.addEventListener('click', () => {
-        if (cartArray.length != 0)
-            console.log('Отправить админу');
+    aproveBtn.addEventListener('click', async () => {
+        await fetch(`${SERVER_URL}/api/cart/send`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify( { cart_id: cartID } ),
+        });
+        document.cookie = "cart_id=; max-age=0; path=/;";
+        await getCartID();
+        console.log(cartID);
+        setItems();
+        showAlert('Заказ отправлен');
     });
+}
+
+function showAlert(mes) {
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+
+    const modal = document.createElement('div');
+    modal.classList.add("modal");
+
+    modal.innerHTML = `
+        <h2 class="modal__header">Добавить в корзину</h2>
+        <h2 class="modal__header" style="margin: 10px;">${mes}</h2>
+        <div class="modal__btn-container">
+            <button class="product-card__button" id="modal__btn--cancel">Отмена</button>
+        </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const cancelButton = modal.querySelector('#modal__btn--cancel');
+    cancelButton.addEventListener('click', () => {
+        document.body.removeChild(overlay);
+    });
+}
+
+async function renderCabinet() {
+    document.querySelector('#nickname').innerText = user_info.login;
+    const list = document.querySelector('#orders-list');
+    list.innerHTML = '';
+    let carts;
+    console.log(user_info);
+    await fetch(`${SERVER_URL}/api/user/getcarts/${user_info.id}`)
+        .then(res => res.json())
+        .then(data => {
+            for (let item of data) {
+                list.innerHTML += `
+                    <div class="orders-item">
+                        <div>
+                            <p class="order-name">Заказ №${item.id}</p>
+                            <p class="order-status">Статус: ${item.is_delivered ? "Доставлен" : "Ожидание"}</p>
+                        </div>
+                        <div>
+                            <button class="product-card__button" id="order-details-${item.id}" style="margin: 0">Подробнее</button>
+                        </div>
+                    </div>
+                `;
+                document.querySelector(`#order-details-${item.id}`).addEventListener('click', () => {
+                    alert(123);
+                });
+            }
+        });
 }

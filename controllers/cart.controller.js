@@ -4,8 +4,8 @@ class CartController {
     static async createCart(req, res) {
         try {
             let {user_id} = req.body;
-            const result = await pool.query('INSERT INTO carts (user_id) VALUES ($1) RETURNING id', [user_id]);
-            res.status(200).json({id: result.rows[0].id});
+            const result = await pool.query('INSERT INTO carts (user_id, is_delivered, is_sent) VALUES ($1, FALSE, FALSE) RETURNING id', [user_id]);
+            res.status(200).json({id: result.rows[0].id });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Server error' });
@@ -69,10 +69,10 @@ class CartController {
             res.status(500).json({ error: 'Server error' });
         }
     }
-    static async clearCart(req, res) {
+    static async sendCart(req, res) {
         try {
             let { cart_id } = req.body;
-            await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cart_id]);
+            await pool.query('UPDATE carts SET is_sent = true WHERE id = $1', [cart_id]);
             res.status(200).json({ success: true });
         } catch (err) {
             console.error(err);

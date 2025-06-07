@@ -17,3 +17,28 @@ h1, h2, h3 {
 .hiden {
     display: none !important;
 }
+
+@media (max-width: 370px) {
+    * {
+        font-size: 14px !important;
+    }
+    button {
+        padding: 5px !important;
+    }
+    .modal__amount {
+        margin-bottom: 5px !important;
+        button {
+            padding: 4px 10px !important;
+        }
+    }
+    .modal {
+        padding: 10px !important;
+    }
+    .header__link img {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    .header {
+        padding: 10px !important;
+    }
+}

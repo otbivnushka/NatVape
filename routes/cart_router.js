@@ -6,7 +6,7 @@ cartRouter.post('/cart', CartController.createCart);
 cartRouter.get('/cart/:id', CartController.getCart);
 cartRouter.put('/cart/add', CartController.addToCart);
 cartRouter.put('/cart/delete', CartController.deleteFromCart);
-cartRouter.put('/cart/clear', CartController.clearCart);
+cartRouter.put('/cart/send', CartController.sendCart);
 cartRouter.delete('/cart', CartController.deleteCart);
 
 module.exports = cartRouter;

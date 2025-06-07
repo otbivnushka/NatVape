@@ -107,6 +107,30 @@ h1, h2, h3 {
   display: none !important;
 }
 
+@media (max-width: 370px) {
+  * {
+    font-size: 14px !important;
+  }
+  button {
+    padding: 5px !important;
+  }
+  .modal__amount {
+    margin-bottom: 5px !important;
+  }
+  .modal__amount button {
+    padding: 4px 10px !important;
+  }
+  .modal {
+    padding: 10px !important;
+  }
+  .header__link img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .header {
+    padding: 10px !important;
+  }
+}
 .header {
   position: fixed;
   bottom: 20px;
@@ -339,6 +363,17 @@ h1, h2, h3 {
   gap: 10px;
   justify-content: center;
   align-items: center;
+}
+
+.empty-cart {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  font-size: 20px;
+  font-weight: bold;
+  color: rgb(90, 90, 90);
 }
 
 @media (max-width: 1150px) {
