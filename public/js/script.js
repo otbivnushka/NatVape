@@ -1,5 +1,5 @@
 let cartID = 0;
-const SERVER_URL = "http://localhost:3000";
+const SERVER_URL = window.location.origin;
 let user_info = {};
 
 function getCookie(name) {
