@@ -1,5 +1,5 @@
 let cartID = 0;
-const SERVER_URL = "https://natvape-production.up.railway.app";
+const SERVER_URL = "http://localhost:3000";
 let user_info = {};
 
 function getCookie(name) {
@@ -283,8 +283,6 @@ async function showModalAddToCart(id, name, price, image) {
             },
             body: JSON.stringify(item),
         });
-        // cartArray.push(item);
-        // localStorage.setItem('cartArray', JSON.stringify(cartArray));
     });
 
     const minusButton = modal.querySelector('#modal__btn-minus');
@@ -401,26 +399,35 @@ async function renderCabinet() {
     document.querySelector('#nickname').innerText = user_info.login;
     const list = document.querySelector('#orders-list');
     list.innerHTML = '';
-    let carts;
-    console.log(user_info);
-    await fetch(`${SERVER_URL}/api/user/getcarts/${user_info.id}`)
-        .then(res => res.json())
-        .then(data => {
-            for (let item of data) {
-                list.innerHTML += `
-                    <div class="orders-item">
-                        <div>
-                            <p class="order-name">Заказ №${item.id}</p>
-                            <p class="order-status">Статус: ${item.is_delivered ? "Доставлен" : "Ожидание"}</p>
-                        </div>
-                        <div>
-                            <button class="product-card__button" id="order-details-${item.id}" style="margin: 0">Подробнее</button>
-                        </div>
+
+    try {
+        const res = await fetch(`${SERVER_URL}/api/user/getcarts/${user_info.id}`);
+        const data = await res.json();
+
+        for (let item of data) {
+            const orderHTML = `
+                <div class="orders-item">
+                    <div>
+                        <p class="order-name">Заказ №${item.id}</p>
+                        <p class="order-status">Статус: ${item.is_delivered ? "Доставлен" : "Ожидание"}</p>
                     </div>
-                `;
-                document.querySelector(`#order-details-${item.id}`).addEventListener('click', () => {
-                    alert(123);
-                });
-            }
+                    <div>
+                        <button class="product-card__button order-details-btn" data-id="${item.id}" style="margin: 0">Подробнее</button>
+                    </div>
+                </div>
+            `;
+            list.insertAdjacentHTML('beforeend', orderHTML);
+        }
+
+        // Навешиваем обработчики после полной отрисовки
+        document.querySelectorAll('.order-details-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const orderId = btn.dataset.id;
+                alert(`Нажат заказ ${orderId}`);
+            });
         });
+
+    } catch (err) {
+        console.error('Ошибка загрузки заказов:', err);
+    }
 }

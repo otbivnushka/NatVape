@@ -21,6 +21,8 @@ app.use('/api', categoriesRouter);
 app.use('/api', cartRouter);
 app.use('/api', userRouter);
 
-app.listen(PORT, () => {
-  console.log(`Сервер запущен: http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Сервер запущен: http://localhost:${PORT}`);
+// });
+
+module.exports = app;
