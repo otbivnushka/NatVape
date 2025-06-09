@@ -6,7 +6,6 @@ const productRouter = require('./routes/product_router.js');
 const categoriesRouter = require('./routes/categories_router.js');
 const cartRouter = require('./routes/cart_router.js');
 const userRouter = require('./routes/user_router.js');
-const PORT = 3000;
 
 // === Express Backend ===
 
@@ -24,7 +23,7 @@ app.use('/api', userRouter);
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`🟢 Сервер запущен: http://localhost:${PORT}`);
+    console.log(`Сервер запущен: http://localhost:${PORT}`);
   });
 }
 
